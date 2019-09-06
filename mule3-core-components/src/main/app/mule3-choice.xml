@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="schedule" initialState="stopped">
+		<poll frequency="1000" doc:name="Poll">
+			<logger doc:name="Logger" />
+		</poll>
+		<flow-ref name="choice-example" doc:name="Flow Reference" />
+	</flow>
+
+	<flow name="choice-example">
+		<set-payload value="{&quot;myKey&quot;: &quot;myValue&quot;}" doc:name="Static JSON: {&quot;myKey&quot;: &quot;myValue&quot;}" mimeType="application/json" />
+
+		<json:json-to-object-transformer returnClass="java.util.HashMap" />
+		
+		<choice doc:name="Choice">
+			<when expression="#[payload.myKey.contains('myValue')]">
+				<logger level="INFO" doc:name="Logger" message="Matching route" />
+			</when>
+			<otherwise>
+				<logger doc:name="Logger" />
+			</otherwise>
+		</choice>
+	</flow>
+
+</mule>

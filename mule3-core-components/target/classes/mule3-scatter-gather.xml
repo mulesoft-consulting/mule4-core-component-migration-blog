@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="schedule-scatter">
+		<poll frequency="1000" doc:name="Poll">
+			<logger doc:name="Logger" />
+		</poll>
+		<flow-ref name="scatter-gather-example" doc:name="Flow Reference" />
+	</flow>
+
+	<flow name="scatter-gather-example" processingStrategy="synchronous">
+		<set-payload value="original payload" doc:name="'original payload'" />
+
+		<scatter-gather doc:name="Scatter-Gather">
+			<flow-ref name="route-1" doc:name="route-1" />
+			<flow-ref name="route-2" doc:name="route-2" />
+		</scatter-gather>
+		
+		<logger level="INFO" message="Payload: #[payload] Variables: #[flowVars]" doc:name="Log payload and variables" />
+	</flow>
+
+	<flow name="route-1" processingStrategy="synchronous">
+		<set-payload value="new payload: route-1" doc:name="'new payload: route-1'" />
+		<set-variable variableName="myVar" value="route1" doc:name="myVar=route1" />
+	</flow>
+
+	<flow name="route-2" processingStrategy="synchronous">
+		<scripting:component doc:name="Script">
+			<scripting:script engine="Groovy"><![CDATA[
+		 throw new java.lang.RuntimeException("MYERROR");]]></scripting:script>
+		</scripting:component>
+	</flow>
+
+</mule>

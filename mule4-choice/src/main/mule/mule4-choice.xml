@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<flow name="scheduleCase" initialState="stopped">
+		<scheduler>
+			<scheduling-strategy>
+				<fixed-frequency frequency="1000" timeUnit="MILLISECONDS" />
+			</scheduling-strategy>
+		</scheduler>
+		<flow-ref name="choice-example" />
+		<logger />
+	</flow>
+
+	<flow name="choice-example">
+		<set-payload value="#[{'myKey': 'myValue'}]" doc:name="{'myKey': 'myValue'}" />
+
+		<choice>
+			<when expression="#[payload.myKey contains 'myValue']">
+				<logger level="INFO" doc:name="Logger" />
+			</when>
+		</choice>
+	</flow>
+</mule>
