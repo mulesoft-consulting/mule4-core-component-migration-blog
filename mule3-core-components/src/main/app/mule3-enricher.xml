@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.1"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+<flow name="enricher-example">
+      <set-payload value="#[1]" doc:name="Set Payload"/>
+
+	<enricher target="#[flowVars.myVar]" doc:name="Message Enricher">
+		<flow-ref name="target-system" doc:name="Flow Reference"/>
+	</enricher>
+
+	<logger level="INFO" message="Payload:: #[payload]" doc:name="Logger"/>
+
+	<logger level="INFO" message="myVar:: #[flowVars.myVAR]" doc:name="Logger"/>
+</flow>
+
+<flow name="target-system">
+	<set-payload value="2" doc:name="Set Payload"/>
+</flow>
+
+
+
+
+</mule>
