@@ -7,6 +7,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 	<flow name="schedule-scatter">
 		<poll frequency="1000" doc:name="Poll">
+            <fixed-frequency-scheduler frequency="1000" timeUnit="DAYS"/>
 			<logger doc:name="Logger" />
 		</poll>
 		<flow-ref name="scatter-gather-example" doc:name="Flow Reference" />
