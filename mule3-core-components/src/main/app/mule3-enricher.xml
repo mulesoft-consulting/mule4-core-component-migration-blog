@@ -34,7 +34,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 </flow>
 
 <flow name="resource-system">
-	<set-payload value="#[{&quot;id&quot;:&quot;001&quot;,&quot;role&quot;:&quot;Mule Guru&quot;,&quot;location&quot;:&quot;Where ever a system needs integration&quot;}]" doc:name="Simulate retrival of enhancement data"/>
+	<set-payload value="#[{&quot;id&quot;:&quot;001&quot;,&quot;role&quot;:&quot;Mule Guru&quot;,&quot;location&quot;:&quot;Wherever a system needs integration&quot;}]" doc:name="Simulate retrieval of enhancement data"/>
 </flow>
 
 
