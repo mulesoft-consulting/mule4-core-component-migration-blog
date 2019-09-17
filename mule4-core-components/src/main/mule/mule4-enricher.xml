@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+	<http:listener-config name="httpListenerConfig">
+		<http:listener-connection port="8081" host="0.0.0.0" />
+	</http:listener-config>
+
+	<flow name="enricher-example">
+		<http:listener path="/endpoint" config-ref="httpListenerConfig" />
+
+		<set-payload value="#[output application/json ---{id: '001', name: 'Max Mule'}]" doc:name="Set basic message" />
+
+		<flow-ref name="resource-system" target="employee" targetValue="#[payload]" doc:name="resource-system" />
+
+		<ee:transform doc:name="Merge payload with Enriched data">
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	id: payload.id,
+	name: payload.name,
+	role: vars.employee.role,
+	location: vars.employee.location
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		
+		<logger message="Input payload: #[payload]" level="INFO" doc:name="Log input payload" />
+
+		<logger message="Enricher flow variable: #[vars.employee]" level="INFO" doc:name="Log enricher variable" />
+
+	</flow>
+
+	<flow name="resource-system">
+		<set-payload
+			value="#[ output application/json --- {id: '001', role: 'Mule Guru', location: 'Where ever a system needs integration'}]"
+			doc:name="Simulate retrival of enhancement data" />
+	</flow>
+
+</mule>
