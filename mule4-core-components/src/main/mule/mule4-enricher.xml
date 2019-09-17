@@ -38,8 +38,8 @@ output application/json
 
 	<flow name="resource-system">
 		<set-payload
-			value="#[ output application/json --- {id: '001', role: 'Mule Guru', location: 'Where ever a system needs integration'}]"
-			doc:name="Simulate retrival of enhancement data" />
+			value="#[ output application/json --- {id: '001', role: 'Mule Guru', location: 'Wherever a system needs integration'}]"
+			doc:name="Simulate retrieval of enhancement data" />
 	</flow>
 
 </mule>
