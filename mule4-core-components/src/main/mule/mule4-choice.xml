@@ -3,14 +3,14 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-	<flow name="scheduleCase" initialState="stopped">
+	<flow name="schedule" initialState="stopped">
 		<scheduler>
 			<scheduling-strategy>
 				<fixed-frequency frequency="1000" timeUnit="MILLISECONDS" />
 			</scheduling-strategy>
 		</scheduler>
+
 		<flow-ref name="choice-example" />
-		<logger />
 	</flow>
 
 	<flow name="choice-example">
@@ -18,7 +18,7 @@
 
 		<choice>
 			<when expression="#[payload.myKey contains 'myValue']">
-				<logger level="INFO" doc:name="Logger" />
+				<logger level="INFO" doc:name="Logger" message="Matching route" />
 			</when>
 		</choice>
 	</flow>

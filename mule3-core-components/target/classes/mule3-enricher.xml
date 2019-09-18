@@ -13,17 +13,17 @@
 
 	<flow name="enricher-example">
 		<http:listener config-ref="httpListenerConfig" path="/endpoint" doc:name="Trigger flow with call to localhost:8081/endpoint" />
-		
+
 		<set-payload value="#[{&quot;id&quot;: &quot;001&quot;,&quot;name&quot;: &quot;Max Mule&quot; }]" doc:name="Set basic message" />
 
 		<enricher target="#[flowVars.employee]" doc:name="Message enricher">
 			<flow-ref name="resource-system" doc:name="Call resource system" />
 		</enricher>
-	
+
 		<logger message="Input payload: #[payload]" level="INFO" doc:name="Log input payload" />
-	
+
 		<logger message="Enricher flow variable: #[flowVars.employee]" level="INFO" doc:name="Log enricher flow variable" />
-	
+
 		<dw:transform-message doc:name="Enhanced message">
 			<dw:set-payload><![CDATA[%dw 1.0
 %output application/json
@@ -38,8 +38,8 @@
 	</flow>
 
 	<flow name="resource-system">
-		<set-payload value="#[{&quot;id&quot;:&quot;001&quot;,&quot;role&quot;:&quot;Mule Guru&quot;,&quot;location&quot;:&quot;Where ever a system needs integration&quot;}]"
-			doc:name="Simulate retrival of enhancement data" />
+		<set-payload value="#[{&quot;id&quot;:&quot;001&quot;,&quot;role&quot;:&quot;Mule Guru&quot;,&quot;location&quot;:&quot;Wherever a system needs integration&quot;}]"
+			doc:name="Simulate retrieval of enhancement data" />
 	</flow>
 
 

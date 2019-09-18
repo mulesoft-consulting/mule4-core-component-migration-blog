@@ -3,11 +3,12 @@
 <mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
 	<flow name="schedule-scatter">
-		<poll frequency="1000" doc:name="Poll">
-            <fixed-frequency-scheduler frequency="1000" timeUnit="DAYS"/>
+		<poll>
+			<fixed-frequency-scheduler frequency="1000" timeUnit="DAYS" />
 			<logger doc:name="Logger" />
 		</poll>
 		<flow-ref name="scatter-gather-example" doc:name="Flow Reference" />
@@ -20,7 +21,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 			<flow-ref name="route-1" doc:name="route-1" />
 			<flow-ref name="route-2" doc:name="route-2" />
 		</scatter-gather>
-		
+
 		<logger level="INFO" message="Payload: #[payload] Variables: #[flowVars]" doc:name="Log payload and variables" />
 	</flow>
 
@@ -35,5 +36,4 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 		 throw new java.lang.RuntimeException("MYERROR");]]></scripting:script>
 		</scripting:component>
 	</flow>
-
 </mule>

@@ -9,36 +9,37 @@
 				<fixed-frequency frequency="1000" timeUnit="MILLISECONDS" />
 			</scheduling-strategy>
 		</scheduler>
-		<flow-ref name="scatter-gather-example" />
+		
+		<flow-ref name="scatter-gather-example" doc:name="scatter-gather-example" />
 	</flow>
 
 	<flow name="scatter-gather-example">
 		<set-payload value="original payload" doc:name="'original payload'" />
 
 		<scatter-gather doc:name="Scatter-Gather">
-			<route>		
-				<flow-ref name="route-1" doc:name="route-1"/>
+			<route>
+				<flow-ref name="route-1" doc:name="route-1" />
 			</route>
 			<route>
-				<flow-ref name="route-2" doc:name="route-2"/>	
+				<flow-ref name="route-2" doc:name="route-2" />
 			</route>
 		</scatter-gather>
+
+		<logger level="INFO" message="Payload: #[payload] Variables: #[vars.myVar]" doc:name="Log payload and variables" />
 		
-		<logger level="INFO" message="Payload: #[payload] Variables: #[vars.myVar]" doc:name="Log payload and variables"/>
-		<error-handler >
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="79fb6b4d-f693-4aa6-a118-73c2ea5eb5a2" >
-				<logger level="INFO" doc:name="Logger" doc:id="8ff3e30e-6dae-40c8-bc36-0889af331773" />
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="79fb6b4d-f693-4aa6-a118-73c2ea5eb5a2">
+				<logger level="INFO" doc:name="Logger" />
 			</on-error-continue>
 		</error-handler>
 	</flow>
 
 	<flow name="route-1">
-		<set-payload value="new payload: route-1" doc:name="'new payload: route-1'"/>
-        <set-variable variableName="myVar" value="route1" doc:name="myVar=route1"/>
+		<set-payload value="new payload: route-1" doc:name="'new payload: route-1'" />
+		<set-variable variableName="myVar" value="route1" doc:name="myVar=route1" />
 	</flow>
 
 	<flow name="route-2">
-		<raise-error doc:name="Raise error" doc:id="3eea7c40-6c5e-47a0-9bba-33ecac0d5e75" type="APP:MYERROR"/>
-		
+		<raise-error doc:name="Raise error" doc:id="3eea7c40-6c5e-47a0-9bba-33ecac0d5e75" type="APP:MYERROR" />
 	</flow>
 </mule>
