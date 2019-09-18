@@ -1,31 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans"
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-	http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-	http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
-	http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
 
-	<http:listener-config name="httpListenerConfig" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration" />
 
-	<flow name="enricher-example">
-		<http:listener config-ref="httpListenerConfig" path="/endpoint" doc:name="Trigger flow with call to localhost:8081/endpoint" />
-		
-		<set-payload value="#[{&quot;id&quot;: &quot;001&quot;,&quot;name&quot;: &quot;Max Mule&quot; }]" doc:name="Set basic message" />
+<flow name="enricher-example">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/endpoint" doc:name="Trigger flow with call to localhost:8081/endpoint"/>
+      <set-payload value="#[{&quot;id&quot;: &quot;001&quot;,&quot;name&quot;: &quot;Max Mule&quot; }]" doc:name="Set basic message"/>
 
-		<enricher target="#[flowVars.employee]" doc:name="Message enricher">
-			<flow-ref name="resource-system" doc:name="Call resource system" />
-		</enricher>
-	
-		<logger message="Input payload: #[payload]" level="INFO" doc:name="Log input payload" />
-	
-		<logger message="Enricher flow variable: #[flowVars.employee]" level="INFO" doc:name="Log enricher flow variable" />
-	
-		<dw:transform-message doc:name="Enhanced message">
-			<dw:set-payload><![CDATA[%dw 1.0
+	<enricher target="#[flowVars.employee]" doc:name="Message enricher">
+		<flow-ref name="resource-system" doc:name="Call resource system"/>
+	</enricher>
+        <logger message="Input payload: #[payload]" level="INFO" doc:name="Log input payload"/>
+        <logger message="Enricher flow variable: #[flowVars.employee]" level="INFO" doc:name="Log enricher flow variable"/>
+        <dw:transform-message doc:name="Enhanced message" metadata:id="79a03abc-1bbf-45ad-aa36-a45db5aaf6f7">
+            <dw:set-payload><![CDATA[%dw 1.0
 %output application/json
 ---
 {
@@ -34,13 +30,12 @@
 	role: flowVars.employee.role,
 	location: flowVars.employee.location
 }]]></dw:set-payload>
-		</dw:transform-message>
-	</flow>
+        </dw:transform-message>
+</flow>
 
-	<flow name="resource-system">
-		<set-payload value="#[{&quot;id&quot;:&quot;001&quot;,&quot;role&quot;:&quot;Mule Guru&quot;,&quot;location&quot;:&quot;Where ever a system needs integration&quot;}]"
-			doc:name="Simulate retrival of enhancement data" />
-	</flow>
+<flow name="resource-system">
+	<set-payload value="#[{&quot;id&quot;:&quot;001&quot;,&quot;role&quot;:&quot;Mule Guru&quot;,&quot;location&quot;:&quot;Wherever a system needs integration&quot;}]" doc:name="Simulate retrieval of enhancement data"/>
+</flow>
 
 
 
