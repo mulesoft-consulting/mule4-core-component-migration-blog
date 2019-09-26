@@ -1,5 +1,0 @@
-version '0.0.1'
-
-element 'logger' hasAttribute 'category'
-flows are dash cased
-
