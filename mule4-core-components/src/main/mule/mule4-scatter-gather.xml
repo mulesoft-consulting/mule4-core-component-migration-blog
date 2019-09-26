@@ -28,7 +28,7 @@
 		<logger level="INFO" message="Payload: #[payload] Variables: #[vars.myVar]" doc:name="Log payload and variables" />
 		
 		<error-handler>
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="79fb6b4d-f693-4aa6-a118-73c2ea5eb5a2">
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
 				<logger level="INFO" doc:name="Logger" />
 			</on-error-continue>
 		</error-handler>
@@ -40,6 +40,6 @@
 	</flow>
 
 	<flow name="route-2">
-		<raise-error doc:name="Raise error" doc:id="3eea7c40-6c5e-47a0-9bba-33ecac0d5e75" type="APP:MYERROR" />
+		<raise-error doc:name="Raise error" type="APP:MYERROR" />
 	</flow>
 </mule>

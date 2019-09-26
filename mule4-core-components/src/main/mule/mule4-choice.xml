@@ -18,7 +18,7 @@
 
 		<choice>
 			<when expression="#[payload.myKey contains 'myValue']">
-				<logger level="INFO" doc:name="Logger" message="Matching route" />
+				<logger level="INFO" doc:name="Log Matching Route" message="Matching route" />
 			</when>
 		</choice>
 	</flow>
