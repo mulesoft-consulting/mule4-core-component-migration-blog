@@ -9,7 +9,7 @@
 				<fixed-frequency frequency="1000" timeUnit="MILLISECONDS" />
 			</scheduling-strategy>
 		</scheduler>
-		
+
 		<flow-ref name="scatter-gather-example" doc:name="scatter-gather-example" />
 	</flow>
 
@@ -23,13 +23,16 @@
 			<route>
 				<flow-ref name="route-2" doc:name="route-2" />
 			</route>
+			<route>
+				<flow-ref name="route-3" doc:name="route-3" />
+			</route>
 		</scatter-gather>
 
 		<logger level="INFO" message="Payload: #[payload] Variables: #[vars.myVar]" doc:name="Log payload and variables" />
-		
+
 		<error-handler>
 			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
-				<logger level="INFO" doc:name="Logger" />
+				<logger level="INFO" message="#[error..payload]" doc:name="Logger" />
 			</on-error-continue>
 		</error-handler>
 	</flow>
@@ -40,6 +43,12 @@
 	</flow>
 
 	<flow name="route-2">
-		<raise-error doc:name="Raise error" type="APP:MYERROR" />
+		<set-payload value="new payload: route-2" doc:name="'new payload: route-2'" />
+		<set-variable variableName="myVar" value="route2" doc:name="myVar=route2" />
 	</flow>
+	
+	<flow name="route-3">
+		<raise-error type="APP:MYERROR" />
+	</flow>
+
 </mule>
