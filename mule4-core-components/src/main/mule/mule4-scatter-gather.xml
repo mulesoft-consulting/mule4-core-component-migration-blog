@@ -23,9 +23,11 @@
 			<route>
 				<flow-ref name="route-2" doc:name="route-2" />
 			</route>
+			<!-- 
 			<route>
 				<flow-ref name="route-3" doc:name="route-3" />
 			</route>
+			 -->
 		</scatter-gather>
 
 		<logger level="INFO" message="Payload: #[payload] Variables: #[vars.myVar]" doc:name="Log payload and variables" />

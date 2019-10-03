@@ -8,7 +8,7 @@
 
 	<flow name="schedule-scatter">
 		<poll>
-			<fixed-frequency-scheduler frequency="1000" timeUnit="DAYS" />
+			<fixed-frequency-scheduler frequency="1000" timeUnit="MILLISECONDS" />
 			<logger doc:name="Logger" />
 		</poll>
 		<flow-ref name="scatter-gather-example" doc:name="Flow Reference" />
@@ -20,9 +20,10 @@
 		<scatter-gather doc:name="Scatter-Gather">
 			<flow-ref name="route-1" doc:name="route-1" />
 			<flow-ref name="route-2" doc:name="route-2" />
+			<!-- <flow-ref name="route-3" doc:name="route-3" /> -->
 		</scatter-gather>
 
-		<logger level="INFO" message="Payload: #[payload] Variables: #[flowVars]" doc:name="Log payload and variables" />
+		<logger level="INFO" message="Payload: #[payload] Variables: #[flowVars.myVar]" doc:name="Log payload and variables" />
 	</flow>
 
 	<flow name="route-1" processingStrategy="synchronous">
@@ -31,6 +32,11 @@
 	</flow>
 
 	<flow name="route-2" processingStrategy="synchronous">
+		<set-payload value="new payload: route-2" doc:name="'new payload: route-2'" />
+		<set-variable variableName="myVar" value="route2" doc:name="myVar=route2" />
+	</flow>
+
+	<flow name="route-3" processingStrategy="synchronous">
 		<scripting:component doc:name="Script">
 			<scripting:script engine="Groovy"><![CDATA[
 		 throw new java.lang.RuntimeException("MYERROR");]]></scripting:script>
