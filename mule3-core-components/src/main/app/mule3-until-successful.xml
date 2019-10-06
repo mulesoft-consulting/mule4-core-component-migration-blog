@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+	<http:request-config name="httpRequestConfig" host="localhost" port="8081" doc:name="HTTP Request Configuration" />
+
+	<flow name="schedule-until-successful">
+		<poll doc:name="Poll">
+			<fixed-frequency-scheduler frequency="1000" />
+			<logger doc:name="Logger" />
+		</poll>
+		<flow-ref name="scatter-gather-example" doc:name="Flow Reference" />
+	</flow>
+
+	<flow name="until-successful-example">
+		<set-payload value="original message" doc:name="Set Payload" />
+
+		<until-successful maxRetries="3" secondsBetweenRetries="1" failureExpression="#[message.inboundProperties['http.status'].startsWith('5')]" deadLetterQueue-ref="vm://dlq"
+			synchronous="true" doc:name="Until Successful">
+			<processor-chain doc:name="Processor Chain">
+				<http:request path="error" config-ref="httpRequestConfig" method="GET" doc:name="HTTP /error">
+					<http:success-status-code-validator values="0.599" />
+				</http:request>
+
+				<logger level="INFO" message="Status code: #[message.inboundProperties['http.status']]" doc:name="Logger" />
+			</processor-chain>
+		</until-successful>
+	</flow>
+
+	<flow name="http-error">
+		<http:listener config-ref="httpListenerConfig" path="error" doc:name="HTTP">
+			<http:error-response-builder statusCode="500" />
+		</http:listener>
+		<scripting:component doc:name="Groovy">
+			<scripting:script engine="Groovy"><![CDATA[
+		 throw new java.lang.RuntimeException("500 error");]]></scripting:script>
+		</scripting:component>
+	</flow>
+
+	<flow name="dlq-listener">
+		<vm:inbound-endpoint address="vm://dlq" doc:name="VM" />
+		<logger level="INFO" message="Recieved msg on DLQ" doc:name="Logger" />
+	</flow>
+</mule>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+
+	<http:request-config name="httpRequestConfig" />
+
+	<vm:config name="vmConfig">
+		<vm:connection />
+		<vm:queues>
+			<vm:queue queueName="dlq" />
+		</vm:queues>
+	</vm:config>
+	
+	<flow name="schedule-until-successful">
+		<scheduler>
+			<scheduling-strategy>
+				<fixed-frequency frequency="10000" timeUnit="MILLISECONDS" />
+			</scheduling-strategy>
+		</scheduler>
+
+		<flow-ref name="until-successful-example" doc:name="until-successful-example" />
+	</flow>
+
+	<flow name="until-successful-example">
+		<set-payload value="original message" />
+		
+		<try>
+			<until-successful maxRetries="3" millisBetweenRetries="1000">
+				<http:request method="GET" doc:name="HTTP /error"
+					config-ref="httpRequestConfig" url="http://localhost:8081/error">
+					<http:response-validator>
+						<http:success-status-code-validator values="0..599" />
+					</http:response-validator>
+				</http:request>
+				
+				<logger level="INFO" message="Status code: #[attributes.statusCode]"/>
+				
+				<validation:is-false expression="#[attributes.statusCode startsWith '5']" message="500 Error." doc:name="Is 500?"/>
+			</until-successful>
+			
+			<error-handler>
+				<on-error-continue>
+					<vm:publish doc:name="Publish DLQ" config-ref="vmConfig" queueName="dlq"/>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</flow>
+	
+	<flow name="http-error">
+		<http:listener path="/error" config-ref="httpListenerConfig" >
+			<http:error-response statusCode="#[500]" />
+		</http:listener>
+		<raise-error type="APP:500_ERROR" />
+	</flow>
+	
+	<flow name="dlq-listener">
+		<vm:listener config-ref="vmConfig" queueName="dlq" />
+		<logger level="INFO" message="Recieved msg on DLQ" />
+	</flow>
+	
+	<flow name="async-until-successful-example">
+		<async>
+			<flow-ref name="until-successful-example" />
+		</async>
+	</flow>
+
+</mule>
