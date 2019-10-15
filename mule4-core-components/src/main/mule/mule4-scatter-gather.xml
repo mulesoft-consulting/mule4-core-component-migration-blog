@@ -48,9 +48,5 @@
 		<set-payload value="new payload: route-2" doc:name="'new payload: route-2'" />
 		<set-variable variableName="myVar" value="route2" doc:name="myVar=route2" />
 	</flow>
-	
-	<flow name="route-3">
-		<raise-error type="APP:MYERROR" />
-	</flow>
 
 </mule>
