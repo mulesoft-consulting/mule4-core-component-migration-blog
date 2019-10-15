@@ -10,23 +10,25 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
 	<http:request-config name="httpRequestConfig" host="localhost" port="8081" doc:name="HTTP Request Configuration" />
-
+	
+	<vm:endpoint exchange-pattern="one-way" path="dlq" name="dlqChannel" doc:name="VM"/>
+	
 	<flow name="schedule-until-successful">
 		<poll doc:name="Poll">
 			<fixed-frequency-scheduler frequency="1000" />
 			<logger doc:name="Logger" />
 		</poll>
-		<flow-ref name="scatter-gather-example" doc:name="Flow Reference" />
+		<flow-ref name="until-successful-example" doc:name="until-successful-example" />
 	</flow>
 
 	<flow name="until-successful-example">
 		<set-payload value="original message" doc:name="Set Payload" />
 
-		<until-successful maxRetries="3" secondsBetweenRetries="1" failureExpression="#[message.inboundProperties['http.status'].startsWith('5')]" deadLetterQueue-ref="vm://dlq"
-			synchronous="true" doc:name="Until Successful">
+		<until-successful maxRetries="3" failureExpression="#[message.inboundProperties['http.status'].startsWith('5')]" deadLetterQueue-ref="dlqChannel" synchronous="false"
+			doc:name="Until Successful" objectStore-ref="_defaultUserObjectStore" millisBetweenRetries="1000">
 			<processor-chain doc:name="Processor Chain">
 				<http:request path="error" config-ref="httpRequestConfig" method="GET" doc:name="HTTP /error">
-					<http:success-status-code-validator values="0.599" />
+					<http:success-status-code-validator values="0..599" />
 				</http:request>
 
 				<logger level="INFO" message="Status code: #[message.inboundProperties['http.status']]" doc:name="Logger" />
@@ -45,7 +47,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	</flow>
 
 	<flow name="dlq-listener">
-		<vm:inbound-endpoint address="vm://dlq" doc:name="VM" />
+		<vm:inbound-endpoint path="dlq" doc:name="VM" />
 		<logger level="INFO" message="Recieved msg on DLQ" doc:name="Logger" />
 	</flow>
 </mule>
