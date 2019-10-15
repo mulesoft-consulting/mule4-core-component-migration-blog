@@ -13,7 +13,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	
 	<vm:endpoint exchange-pattern="one-way" path="dlq" name="dlqChannel" doc:name="VM"/>
 	
-	<flow name="schedule-until-successful">
+	<flow name="schedule-until-successful" initialState="stopped">
 		<poll doc:name="Poll">
 			<fixed-frequency-scheduler frequency="1000" />
 			<logger doc:name="Logger" />

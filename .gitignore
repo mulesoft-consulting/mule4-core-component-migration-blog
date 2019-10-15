@@ -1,4 +1,5 @@
 
 .DS_Store
-mule3-core-components/target/classes/mule-deploy.properties
 target/
+*/target
+/mule3-core-components/target/*
