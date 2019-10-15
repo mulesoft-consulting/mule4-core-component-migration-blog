@@ -1,45 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
 
 	<flow name="schedule-scatter">
-		<poll>
-			<fixed-frequency-scheduler frequency="1000" timeUnit="MILLISECONDS" />
+		<poll doc:name="Poll">
+			<fixed-frequency-scheduler frequency="1000"  />
 			<logger doc:name="Logger" />
 		</poll>
-		<flow-ref name="scatter-gather-example" doc:name="Flow Reference" />
+		<flow-ref name="scatter-gather-example" doc:name="scatter-gather-example" />
 	</flow>
 
-	<flow name="scatter-gather-example" processingStrategy="synchronous">
-		<set-payload value="original payload" doc:name="'original payload'" />
 
-		<scatter-gather doc:name="Scatter-Gather">
-			<flow-ref name="route-1" doc:name="route-1" />
-			<flow-ref name="route-2" doc:name="route-2" />
-			<!-- <flow-ref name="route-3" doc:name="route-3" /> -->
-		</scatter-gather>
+<flow name="scatter-gather-example">
+  <set-payload value="original payload" doc:name="'original payload'"/>
 
-		<logger level="INFO" message="Payload: #[payload] Variables: #[flowVars.myVar]" doc:name="Log payload and variables" />
-	</flow>
+  <scatter-gather doc:name="Scatter-Gather">
+    <flow-ref name="route-1" doc:name="route-1"/>
+    <flow-ref name="route-2" doc:name="route-2"/>
+  </scatter-gather>
+        <dw:transform-message doc:name="Transform payload to JSON">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+payload]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="Payload: #[payload] " level="INFO" doc:name="Log payload"/>
 
-	<flow name="route-1" processingStrategy="synchronous">
-		<set-payload value="new payload: route-1" doc:name="'new payload: route-1'" />
-		<set-variable variableName="myVar" value="route1" doc:name="myVar=route1" />
-	</flow>
+  <logger level="INFO" 
+    message="Variables: #[flowVars.myVar]" 
+    doc:name="Log variables"/>
+</flow>
 
-	<flow name="route-2" processingStrategy="synchronous">
-		<set-payload value="new payload: route-2" doc:name="'new payload: route-2'" />
-		<set-variable variableName="myVar" value="route2" doc:name="myVar=route2" />
-	</flow>
+<flow name="route-1" processingStrategy="synchronous">
+  <set-payload value="new payload: route-1" 
+    doc:name="'new payload: route-1'"/>
+  <set-variable variableName="myVar" value="route1" 
+    doc:name="myVar=route1"/>
+</flow>
 
-	<flow name="route-3" processingStrategy="synchronous">
-		<scripting:component doc:name="Script">
-			<scripting:script engine="Groovy"><![CDATA[
-		 throw new java.lang.RuntimeException("MYERROR");]]></scripting:script>
-		</scripting:component>
-	</flow>
+<flow name="route-2" processingStrategy="synchronous">
+  <set-payload value="new payload: route-2" 
+    doc:name="'new payload: route-2'"/>
+  <set-variable variableName="myVar" value="route2" 
+    doc:name="myVar=route2"/>
+</flow>
+
+
+
+
+
+
 </mule>
