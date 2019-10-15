@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-
-	<flow name="schedule-scatter" initialState="stopped">
-		<scheduler>
-			<scheduling-strategy>
-				<fixed-frequency frequency="1000" timeUnit="MILLISECONDS" />
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="56fc6b69-bf25-4c9b-91d2-255a5649c9a3" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+<flow name="schedule-scatter" initialState="started">
+		<scheduler doc:name="Scheduler" doc:id="1be98552-7150-4db9-8ef8-385efc2437bb" >
+			<scheduling-strategy >
+				<fixed-frequency />
 			</scheduling-strategy>
 		</scheduler>
+		<flow-ref doc:name="scatter-gather-example" doc:id="2f489aca-188d-445e-ad47-fd516583dc67" name="scatter-gather-example"/>
 
-		<flow-ref name="scatter-gather-example" doc:name="scatter-gather-example" />
 	</flow>
 
 	<flow name="scatter-gather-example">
@@ -29,14 +35,14 @@
 			</route>
 			 -->
 		</scatter-gather>
-
-		<logger level="INFO" message="Payload: #[payload] Variables: #[vars.myVar]" doc:name="Log payload and variables" />
-
-		<error-handler>
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue">
-				<logger level="INFO" message="#[error..payload]" doc:name="Logger" />
-			</on-error-continue>
-		</error-handler>
+		<logger level="INFO" doc:name="Log payload JSON" doc:id="ab669846-bcac-4012-90c4-0f3b2f6fe815" message="#[%dw 2.0
+output application/json
+---
+payload]"/>
+		<logger level="INFO" message="#[%dw 2.0
+output application/json
+---
+vars.myVar]" doc:name="Log variables JSON" doc:id="08cde16d-9be3-4a93-8b87-a42bf1639e2c"/>
 	</flow>
 
 	<flow name="route-1">
@@ -49,8 +55,5 @@
 		<set-variable variableName="myVar" value="route2" doc:name="myVar=route2" />
 	</flow>
 	
-	<flow name="route-3">
-		<raise-error type="APP:MYERROR" />
-	</flow>
-
-</mule>
+	
+	</mule>
